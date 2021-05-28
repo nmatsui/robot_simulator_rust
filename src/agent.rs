@@ -3,10 +3,12 @@ mod square_agent;
 
 use std::fmt;
 
-pub fn create_agent(mut args: std::env::Args) -> Result<Box<dyn Agent>, String> {
-  args.next();
+extern crate nalgebra as na;
 
-  let landmarks = vec![(1.0, 2.0)];
+use crate::data::Point;
+
+pub fn create_agent(mut args: std::env::Args, landmarks: Vec<Point>) -> Result<Box<dyn Agent>, String> {
+  args.next();
 
   let agent: Box<dyn Agent> = match args.next() {
     Some(name) => {
@@ -21,10 +23,11 @@ pub fn create_agent(mut args: std::env::Args) -> Result<Box<dyn Agent>, String> 
   Ok(agent)
 }
 
-pub trait Agent {
-  fn get_ideal(&self, t: f32) -> (f32, f32, f32);
+pub trait Agent: Send {
   fn get_name(&self) -> &str;
-  fn move_next(&self) {
+  fn get_landmarks(&self) -> &Vec<Point>;
+  fn get_ideal(&self, t: f64) -> na::Vector3<f64>;
+  fn move_next(&self) -> () {
     println!("move");
   }
 }

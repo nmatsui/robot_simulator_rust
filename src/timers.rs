@@ -6,12 +6,13 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 
 use crate::filters::EKF;
+use crate::data::{Point, Pose};
 
 const INTERVAL_MS: u64 = 200;
 const PORT: u64 = 5556;
 
 
-pub fn start(ekf: EKF) -> Result<(), Box<dyn std::error::Error>> {
+pub fn start(mut ekf: EKF) -> Result<(), Box<dyn std::error::Error>> {
   let rt = tokio::runtime::Runtime::new()?;
   let zeromq = ZeroMQ::new(PORT)?;
 
@@ -21,8 +22,8 @@ pub fn start(ekf: EKF) -> Result<(), Box<dyn std::error::Error>> {
 
       loop {
         interval.tick().await;
-        ekf.step();
-        if let Err(e) = zeromq.send() {
+        let (ideal, xhat, p, k) = ekf.step();
+        if let Err(e) = zeromq.send(ideal, xhat, p, k) {
           eprintln!("send message error: {:?}", e);
         }
       }
@@ -44,61 +45,43 @@ impl ZeroMQ {
     Ok(ZeroMQ { publisher })
   }
 
-  fn send(&self) -> Result<(), Box<dyn std::error::Error>> {
+  fn send(&self, ideal: Pose, xhat: Pose, p: Vec<f64>, k: Vec<f64>) -> Result<(), Box<dyn std::error::Error>> {
     let payload = Payload {
-      ideal: Pose {
-        x: 0.0,
-        y: 0.0,
-        theta: 0.0,
-      },
+      ideal: ideal,
       actual: Pose {
         x: 0.0,
         y: 0.0,
         theta: 0.0,
       },
-      xhat: Pose {
-        x: 0.0,
-        y: 0.0,
-        theta: 0.0,
-      },
+      xhat: xhat,
       observed: vec![Observed {
-        landmark: Landmark {
+        landmark: Point {
           x: 1.0,
           y: 1.0,
         },
         distance: 1.0,
         angle: 0.1,
       }],
-      covariance: vec![0.0],
-      kalmanGain: vec![0.0],
+      covariance: p,
+      kalmanGain: k,
     };
+    println!("payload = {:?}", payload);
     let j = serde_json::to_string(&payload)?;
     self.publisher.send(&j, 0)?;
     Ok(())
   }
 }
 
-#[derive(Serialize, Deserialize)]
-struct Pose {
-  x: f64,
-  y: f64,
-  theta: f64,
-}
-
-#[derive(Serialize, Deserialize)]
-struct Landmark {
-  x: f64,
-  y: f64,
-}
-
+#[derive(Debug)]
 #[derive(Serialize, Deserialize)]
 struct Observed {
-  landmark: Landmark,
+  landmark: Point,
   distance: f64,
   angle: f64,
 }
 
 #[allow(non_snake_case)]
+#[derive(Debug)]
 #[derive(Serialize, Deserialize)]
 struct Payload {
   ideal: Pose,
