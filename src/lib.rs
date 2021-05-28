@@ -19,7 +19,7 @@ const LANDMARKS: [Point; 8]  = [
 
 pub fn run(args: std::env::Args) -> Result<(), Box<dyn Error>> {
   let agt = agent::create_agent(args, LANDMARKS.to_vec())?;
-  let ekf = filters::EKF::new(agt, INITIAL_POSE);
+  let ekf = filters::kalman_filter::EKF::new(agt, INITIAL_POSE);
   timers::start(ekf)?;
 
   Ok(())

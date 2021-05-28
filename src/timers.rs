@@ -5,7 +5,7 @@ use zmq;
 use serde::{Deserialize, Serialize};
 use serde_json;
 
-use crate::filters::EKF;
+use crate::filters::kalman_filter::EKF;
 use crate::data::{Point, Pose};
 
 const INTERVAL_MS: u64 = 200;
