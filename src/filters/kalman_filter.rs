@@ -8,7 +8,7 @@ use crate::planners::dwa_wo_obstacle;
 
 #[derive(Debug)]
 pub struct EKF {
-  agent: Box<dyn Agent>,
+  pub agent: Box<dyn Agent>,
   xhat: na::Vector3<f64>,
   input: na::Vector2<f64>,
   start_t: Instant,
@@ -31,7 +31,7 @@ impl EKF {
 
     let ideal = self.agent.get_ideal(self.start_t.elapsed().as_secs_f64());
     let input = dwa_wo_obstacle::get_input(&self.xhat, &ideal, &self.input, delta);
-    println!("#### {:?}", input);
+    self.agent.noisy_move(&self.xhat, &input, delta);
 
     self.t = t;
 

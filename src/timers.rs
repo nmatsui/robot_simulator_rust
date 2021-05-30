@@ -23,7 +23,8 @@ pub fn start(mut ekf: EKF) -> Result<(), Box<dyn std::error::Error>> {
       loop {
         interval.tick().await;
         let (ideal, xhat, p, k) = ekf.step();
-        if let Err(e) = zeromq.send(ideal, xhat, p, k) {
+        let actual = Pose::from_vector3(ekf.agent.get_actual());
+        if let Err(e) = zeromq.send(ideal, actual, xhat, p, k) {
           eprintln!("send message error: {:?}", e);
         }
       }
@@ -45,14 +46,10 @@ impl ZeroMQ {
     Ok(ZeroMQ { publisher })
   }
 
-  fn send(&self, ideal: Pose, xhat: Pose, p: Vec<f64>, k: Vec<f64>) -> Result<(), Box<dyn std::error::Error>> {
+  fn send(&self, ideal: Pose, actual: Pose, xhat: Pose, p: Vec<f64>, k: Vec<f64>) -> Result<(), Box<dyn std::error::Error>> {
     let payload = Payload {
       ideal: ideal,
-      actual: Pose {
-        x: 0.0,
-        y: 0.0,
-        theta: 0.0,
-      },
+      actual: actual,
       xhat: xhat,
       observed: vec![Observed {
         landmark: Point {

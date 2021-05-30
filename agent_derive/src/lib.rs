@@ -15,7 +15,8 @@ fn impl_agent_derive(ast: &syn::DeriveInput) -> TokenStream {
   let gen = quote! {
     impl #name {
       pub fn new(landmarks: Vec<Point>) -> #name {
-        #name { landmarks }
+        let actual = na::Vector3::new(0.0, 0.0, 0.0);
+        #name { landmarks, actual }
       }
     }
 
@@ -25,6 +26,12 @@ fn impl_agent_derive(ast: &syn::DeriveInput) -> TokenStream {
       }
       fn get_landmarks(&self) -> &Vec<Point> {
         &self.landmarks
+      }
+      fn set_actual(&mut self, actual: na::Vector3<f64>) -> () {
+        self.actual = actual;
+      }
+      fn get_actual(&self) -> &na::Vector3<f64> {
+        &self.actual
       }
     }
   };

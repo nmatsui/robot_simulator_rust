@@ -4,8 +4,14 @@ mod square_agent;
 use std::fmt;
 
 extern crate nalgebra as na;
+extern crate rand;
+use rand_distr::{Normal, Distribution};
 
 use crate::data::Point;
+use crate::models::robot;
+
+const ACTUAL_XY_SD: f64 = 0.01;
+const ACTUAL_THETA_SD: f64 = 0.02;
 
 pub fn create_agent(mut args: std::env::Args, landmarks: Vec<Point>) -> Result<Box<dyn Agent>, String> {
   args.next();
@@ -26,8 +32,16 @@ pub fn create_agent(mut args: std::env::Args, landmarks: Vec<Point>) -> Result<B
 pub trait AgentDerive: Send {
   fn get_name(&self) -> &str;
   fn get_landmarks(&self) -> &Vec<Point>;
-  fn move_next(&self) -> () {
-    println!("move");
+  fn set_actual(&mut self, actual: na::Vector3<f64>) -> ();
+  fn get_actual(&self) -> &na::Vector3<f64>;
+  fn noisy_move(&mut self, current: &na::Vector3<f64>, input: &na::Vector2<f64>, delta: f64) -> () {
+    let ideal_pose = robot::ideal_move(current, input, delta);
+    let noisy_pose = na::Vector3::new(
+      Normal::new(ideal_pose[0], ACTUAL_XY_SD).unwrap().sample(&mut rand::thread_rng()),
+      Normal::new(ideal_pose[1], ACTUAL_XY_SD).unwrap().sample(&mut rand::thread_rng()),
+      Normal::new(ideal_pose[2], ACTUAL_THETA_SD).unwrap().sample(&mut rand::thread_rng()),
+    );
+    self.set_actual(noisy_pose);
   }
 }
 

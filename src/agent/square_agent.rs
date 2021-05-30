@@ -13,6 +13,7 @@ const INPUT_OMEGA: f64 = 0.2;
 #[derive(AgentDerive)]
 pub struct SquareAgent {
   landmarks: Vec<Point>,
+  actual: na::Vector3<f64>,
 }
 
 impl Agent for SquareAgent {
