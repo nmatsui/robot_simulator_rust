@@ -2,32 +2,20 @@ use std::f64::consts::PI;
 
 extern crate nalgebra as na;
 
-use crate::agent::Agent;
+use crate::agent::{AgentDerive, Agent};
 use crate::data::Point;
 use crate::utils;
+use agent_derive::AgentDerive;
 
 const INPUT_V: f64 = 0.2;
 const INPUT_OMEGA: f64 = 0.2;
 
+#[derive(AgentDerive)]
 pub struct SquareAgent {
   landmarks: Vec<Point>,
 }
 
-impl SquareAgent {
-  pub fn new(landmarks: Vec<Point>) -> SquareAgent {
-    SquareAgent { landmarks }
-  }
-}
-
 impl Agent for SquareAgent {
-  fn get_name(&self) -> &str {
-    "SquareAgent"
-  }
-
-  fn get_landmarks(&self) -> &Vec<Point> {
-    &self.landmarks
-  }
-
   fn get_ideal(&self, t: f64) ->  na::Vector3<f64> {
 
     let d0 = 0.0;

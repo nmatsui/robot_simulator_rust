@@ -2,31 +2,19 @@ use std::f64::consts::PI;
 
 extern crate nalgebra as na;
 
-use crate::agent::Agent;
+use crate::agent::{AgentDerive, Agent};
 use crate::data::Point;
 use crate::utils;
+use agent_derive::AgentDerive;
 
 const INPUT_OMEGA: f64 = 0.2;
 
+#[derive(AgentDerive)]
 pub struct CircularAgent {
   landmarks: Vec<Point>,
 }
 
-impl CircularAgent {
-  pub fn new(landmarks: Vec<Point>) -> CircularAgent {
-    CircularAgent { landmarks }
-  }
-}
-
 impl Agent for CircularAgent {
-  fn get_name(&self) -> &str {
-    "CircularAgent"
-  }
-
-  fn get_landmarks(&self) -> &Vec<Point> {
-    &self.landmarks
-  }
-
   fn get_ideal(&self, t: f64) ->  na::Vector3<f64> {
     let angle = INPUT_OMEGA * t;
     let x = angle.cos();

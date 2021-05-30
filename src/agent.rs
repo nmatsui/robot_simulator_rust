@@ -23,13 +23,16 @@ pub fn create_agent(mut args: std::env::Args, landmarks: Vec<Point>) -> Result<B
   Ok(agent)
 }
 
-pub trait Agent: Send {
+pub trait AgentDerive: Send {
   fn get_name(&self) -> &str;
   fn get_landmarks(&self) -> &Vec<Point>;
-  fn get_ideal(&self, t: f64) -> na::Vector3<f64>;
   fn move_next(&self) -> () {
     println!("move");
   }
+}
+
+pub trait Agent: AgentDerive {
+  fn get_ideal(&self, t: f64) -> na::Vector3<f64>;
 }
 
 impl fmt::Debug for dyn Agent {
