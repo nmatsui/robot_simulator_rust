@@ -3,7 +3,7 @@ use std::f64::consts::PI;
 extern crate nalgebra as na;
 
 use crate::agent::{AgentDerive, Agent};
-use crate::data::Point;
+use crate::data::{Point, Observed};
 use crate::utils;
 use agent_derive::AgentDerive;
 
@@ -14,6 +14,7 @@ const INPUT_OMEGA: f64 = 0.2;
 pub struct SquareAgent {
   landmarks: Vec<Point>,
   actual: na::Vector3<f64>,
+  observed: Vec<Observed>,
 }
 
 impl Agent for SquareAgent {

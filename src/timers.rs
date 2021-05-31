@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 
 use crate::filters::kalman_filter::EKF;
-use crate::data::{Point, Pose};
+use crate::data::{Pose, Observed};
 
 const INTERVAL_MS: u64 = 200;
 const PORT: u64 = 5556;
@@ -24,7 +24,8 @@ pub fn start(mut ekf: EKF) -> Result<(), Box<dyn std::error::Error>> {
         interval.tick().await;
         let (ideal, xhat, p, k) = ekf.step();
         let actual = Pose::from_vector3(ekf.agent.get_actual());
-        if let Err(e) = zeromq.send(ideal, actual, xhat, p, k) {
+        let observed = ekf.agent.get_observed();
+        if let Err(e) = zeromq.send(ideal, actual, xhat, observed, p, k) {
           eprintln!("send message error: {:?}", e);
         }
       }
@@ -46,19 +47,12 @@ impl ZeroMQ {
     Ok(ZeroMQ { publisher })
   }
 
-  fn send(&self, ideal: Pose, actual: Pose, xhat: Pose, p: Vec<f64>, k: Vec<f64>) -> Result<(), Box<dyn std::error::Error>> {
+  fn send(&self, ideal: Pose, actual: Pose, xhat: Pose, observed: &Vec<Observed>, p: Vec<f64>, k: Vec<f64>) -> Result<(), Box<dyn std::error::Error>> {
     let payload = Payload {
       ideal: ideal,
       actual: actual,
       xhat: xhat,
-      observed: vec![Observed {
-        landmark: Point {
-          x: 1.0,
-          y: 1.0,
-        },
-        distance: 1.0,
-        angle: 0.1,
-      }],
+      observed: observed.to_vec(),
       covariance: p,
       kalmanGain: k,
     };
@@ -67,14 +61,6 @@ impl ZeroMQ {
     self.publisher.send(&j, 0)?;
     Ok(())
   }
-}
-
-#[derive(Debug)]
-#[derive(Serialize, Deserialize)]
-struct Observed {
-  landmark: Point,
-  distance: f64,
-  angle: f64,
 }
 
 #[allow(non_snake_case)]
