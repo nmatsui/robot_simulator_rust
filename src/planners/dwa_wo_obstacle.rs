@@ -4,12 +4,12 @@ extern crate itertools;
 use crate::models::robot;
 use crate::utils;
 
-const V_RESOLUTION: f64 = 0.05;
-const OMEGA_RESOLUTION: f64 = 0.05;
-const ERROR_ANGLE_GAIN: f64 = 1.0;
-const VELOCITY_GAIN: f64 = 0.5;
-const DISTANCE_GAIN: f64 = 0.01;
-const THETA_GAIN: f64 = 0.1;
+const V_RESOLUTION: f64 = 0.02;
+const OMEGA_RESOLUTION: f64 = 0.02;
+const ERROR_ANGLE_GAIN: f64 = 0.4;
+const VELOCITY_GAIN: f64 = 0.1;
+const DISTANCE_GAIN: f64 = 1.0;
+const THETA_GAIN: f64 = 0.8;
 
 pub fn get_input(current: &na::Vector3<f64>, destination: &na::Vector3<f64>,
                  current_input: &na::Vector2<f64>, delta: f64) -> na::Vector2<f64> {

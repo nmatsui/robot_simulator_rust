@@ -8,7 +8,7 @@ use crate::utils;
 use agent_derive::AgentDerive;
 
 const INPUT_V: f64 = 0.2;
-const INPUT_OMEGA: f64 = 0.2;
+const INPUT_OMEGA: f64 = 0.5;
 
 #[derive(AgentDerive)]
 pub struct SquareAgent {
