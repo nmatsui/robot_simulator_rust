@@ -10,8 +10,8 @@ use rand_distr::{Normal, Distribution};
 use crate::data::{Point, Observed};
 use crate::models::robot;
 
-const ACTUAL_XY_SD: f64 = 0.01;
-const ACTUAL_THETA_SD: f64 = 0.02;
+const ACTUAL_XY_SD: f64 = 0.005;
+const ACTUAL_THETA_SD: f64 = 0.01;
 const OBSERVED_DIST_SD: f64 = 0.02;
 const OBSERVED_ANGLE_SD: f64 = 0.02;
 

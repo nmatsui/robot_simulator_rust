@@ -2,10 +2,10 @@ extern crate nalgebra as na;
 
 use crate::utils;
 
-pub const MAX_LIN_ACC: f64 = 1.8;
-pub const MAX_ANG_ACC: f64 = 2.0;
-pub const MAX_V: f64 = 1.0;
-pub const MIN_V: f64 = -0.1;
+pub const MAX_LIN_ACC: f64 = 2.5;
+pub const MAX_ANG_ACC: f64 = 2.5;
+pub const MAX_V: f64 = 2.0;
+pub const MIN_V: f64 = 0.0;
 pub const MAX_OMEGA: f64 = 1.5;
 pub const MIN_OMEGA: f64 = -1.5;
 

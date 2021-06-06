@@ -5,16 +5,19 @@ use crate::agent::Agent;
 use crate::models::robot;
 use crate::utils;
 
-const V_RESOLUTION: f64 = 0.02;
-const OMEGA_RESOLUTION: f64 = 0.02;
-const FAR_ERROR_ANGLE_GAIN: f64 = 0.4;
-const FAR_VELOCITY_GAIN: f64 = 0.1;
-const FAR_DISTANCE_GAIN: f64 = 1.0;
-const FAR_THETA_GAIN: f64 = 0.8;
-const NEAR_ERROR_ANGLE_GAIN: f64 = 0.4;
-const NEAR_VELOCITY_GAIN: f64 = 0.1;
-const NEAR_DISTANCE_GAIN: f64 = 1.0;
+const V_RESOLUTION: f64 = 0.01;
+const OMEGA_RESOLUTION: f64 = 0.01;
+
+const FAR_ERROR_ANGLE_GAIN: f64 = 1.0;
+const FAR_VELOCITY_GAIN: f64 = 0.5;
+const FAR_DISTANCE_GAIN: f64 = 0.8;
+const FAR_THETA_GAIN: f64 = 0.01;
+
+const NEAR_ERROR_ANGLE_GAIN: f64 = 1.0;
+const NEAR_VELOCITY_GAIN: f64 = 0.01;
+const NEAR_DISTANCE_GAIN: f64 = 0.5;
 const NEAR_THETA_GAIN: f64 = 0.8;
+
 const DISTANCE_SQUARED_THRESHOLD: f64 = 0.01;
 
 pub fn get_input(agent: &Box<dyn Agent>, current: &na::Vector3<f64>, destination: &na::Vector3<f64>,

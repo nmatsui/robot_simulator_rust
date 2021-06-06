@@ -8,7 +8,7 @@ use crate::models::robot;
 use crate::utils;
 use agent_derive::AgentDerive;
 
-const INPUT_OMEGA: f64 = 0.2;
+const INPUT_OMEGA: f64 = 0.4;
 
 #[derive(AgentDerive)]
 pub struct CircularAgent {

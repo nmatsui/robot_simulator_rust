@@ -8,7 +8,7 @@ use crate::models::robot;
 use crate::utils;
 use agent_derive::AgentDerive;
 
-const INPUT_V: f64 = 0.2;
+const INPUT_V: f64 = 0.3;
 const INPUT_OMEGA: f64 = 0.5;
 
 #[derive(AgentDerive)]
