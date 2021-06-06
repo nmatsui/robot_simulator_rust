@@ -4,6 +4,7 @@ extern crate nalgebra as na;
 
 use crate::agent::{AgentDerive, Agent};
 use crate::data::{Point, Observed};
+use crate::models::robot;
 use crate::utils;
 use agent_derive::AgentDerive;
 
@@ -18,7 +19,7 @@ pub struct SquareAgent {
 }
 
 impl Agent for SquareAgent {
-  fn get_ideal(&self, t: f64) ->  na::Vector3<f64> {
+  fn get_ideal(&self, _: &na::Vector3<f64>, t: f64) ->  na::Vector3<f64> {
 
     let d0 = 0.0;
     let d1 = d0 + 1.0 / INPUT_V;

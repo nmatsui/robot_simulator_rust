@@ -1,20 +1,29 @@
 extern crate nalgebra as na;
 extern crate itertools;
 
+use crate::agent::Agent;
 use crate::models::robot;
 use crate::utils;
 
 const V_RESOLUTION: f64 = 0.02;
 const OMEGA_RESOLUTION: f64 = 0.02;
-const ERROR_ANGLE_GAIN: f64 = 0.4;
-const VELOCITY_GAIN: f64 = 0.1;
-const DISTANCE_GAIN: f64 = 1.0;
-const THETA_GAIN: f64 = 0.8;
+const FAR_ERROR_ANGLE_GAIN: f64 = 0.4;
+const FAR_VELOCITY_GAIN: f64 = 0.1;
+const FAR_DISTANCE_GAIN: f64 = 1.0;
+const FAR_THETA_GAIN: f64 = 0.8;
+const NEAR_ERROR_ANGLE_GAIN: f64 = 0.4;
+const NEAR_VELOCITY_GAIN: f64 = 0.1;
+const NEAR_DISTANCE_GAIN: f64 = 1.0;
+const NEAR_THETA_GAIN: f64 = 0.8;
+const DISTANCE_SQUARED_THRESHOLD: f64 = 0.01;
 
-pub fn get_input(current: &na::Vector3<f64>, destination: &na::Vector3<f64>,
+pub fn get_input(agent: &Box<dyn Agent>, current: &na::Vector3<f64>, destination: &na::Vector3<f64>,
                  current_input: &na::Vector2<f64>, delta: f64) -> na::Vector2<f64> {
+  let max_accelarations = agent.get_max_accelarations(current);
+  let linear_velocities = agent.get_linear_velocities(current);
+  let angular_velocities = agent.get_angular_velocities(current);
 
-  let (v_range, omega_range) = get_window(current_input, delta);
+  let (v_range, omega_range) = get_window(max_accelarations, linear_velocities, angular_velocities, current_input, delta);
 
   let mut input_vec: Vec<na::Vector2<f64>> = Vec::new();
   let mut heading_vec: Vec<f64> = Vec::new();
@@ -40,7 +49,11 @@ pub fn get_input(current: &na::Vector3<f64>, destination: &na::Vector3<f64>,
 
   let min_idx = itertools::izip!(&heading_vec, &velocity_vec, &distance_vec, &theta_vec)
                 .map(|(heading, velocity, distance, theta)|
-                  ERROR_ANGLE_GAIN * heading + VELOCITY_GAIN * velocity + DISTANCE_GAIN * distance + THETA_GAIN * theta
+                  if (current.fixed_rows::<2>(0) - destination.fixed_rows::<2>(0)).norm_squared() < DISTANCE_SQUARED_THRESHOLD {
+                    NEAR_ERROR_ANGLE_GAIN * heading + NEAR_VELOCITY_GAIN * velocity + NEAR_DISTANCE_GAIN * distance + NEAR_THETA_GAIN * theta
+                  } else {
+                    FAR_ERROR_ANGLE_GAIN * heading + FAR_VELOCITY_GAIN * velocity + FAR_DISTANCE_GAIN * distance + FAR_THETA_GAIN * theta
+                  }
                 )
                 .enumerate()
                 .min_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
@@ -50,14 +63,14 @@ pub fn get_input(current: &na::Vector3<f64>, destination: &na::Vector3<f64>,
   input_vec[min_idx]
 }
 
-fn get_window(current_input: &na::Vector2<f64>, delta: f64) -> (Vec<f64>, Vec<f64>) {
-  let delta_v = robot::MAX_LIN_ACC * delta;
-  let delta_omega = robot::MAX_ANG_ACC * delta;
+fn get_window(max_accelarations: (f64, f64), linear_velocities: (f64, f64), angular_velocities: (f64, f64), current_input: &na::Vector2<f64>, delta: f64) -> (Vec<f64>, Vec<f64>) {
+  let delta_v = max_accelarations.0 * delta;
+  let delta_omega = max_accelarations.1 * delta;
 
-  let min_v = robot::MIN_V.max(current_input[0] - delta_v);
-  let max_v = robot::MAX_V.min(current_input[0] + delta_v);
-  let min_omega = robot::MIN_OMEGA.max(current_input[1] - delta_omega);
-  let max_omega = robot::MAX_OMEGA.min(current_input[1] + delta_omega);
+  let min_v = linear_velocities.1.max(current_input[0] - delta_v);
+  let max_v = linear_velocities.0.min(current_input[0] + delta_v);
+  let min_omega = angular_velocities.1.max(current_input[1] - delta_omega);
+  let max_omega = angular_velocities.0.min(current_input[1] + delta_omega);
 
   (
     utils::step_by_float(min_v, max_v, V_RESOLUTION),

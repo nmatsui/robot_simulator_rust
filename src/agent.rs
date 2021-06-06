@@ -38,6 +38,9 @@ pub trait AgentDerive: Send {
   fn get_actual(&self) -> &na::Vector3<f64>;
   fn set_observed(&mut self, observed: Vec<Observed>) -> ();
   fn get_observed(&self) -> &Vec<Observed>;
+  fn get_max_accelarations(&self, current: &na::Vector3<f64>) -> (f64, f64);
+  fn get_linear_velocities(&self, current: &na::Vector3<f64>) -> (f64, f64);
+  fn get_angular_velocities(&self, current: &na::Vector3<f64>) -> (f64, f64);
   fn noisy_move(&mut self, current: &na::Vector3<f64>, input: &na::Vector2<f64>, delta: f64) -> () {
     let ideal_pose = robot::ideal_move(current, input, delta);
     let noisy_pose = na::Vector3::new(
@@ -71,7 +74,7 @@ pub trait AgentDerive: Send {
 }
 
 pub trait Agent: AgentDerive {
-  fn get_ideal(&self, t: f64) -> na::Vector3<f64>;
+  fn get_ideal(&self, current: &na::Vector3<f64>, t: f64) -> na::Vector3<f64>;
 }
 
 impl fmt::Debug for dyn Agent {

@@ -39,8 +39,8 @@ impl EKF {
     let t = Instant::now();
     let delta = (t - self.t).as_secs_f64();
 
-    let ideal = self.agent.get_ideal(self.start_t.elapsed().as_secs_f64());
-    let input = dwa_wo_obstacle::get_input(&self.xhat, &ideal, &self.input, delta);
+    let ideal = self.agent.get_ideal(&self.xhat, self.start_t.elapsed().as_secs_f64());
+    let input = dwa_wo_obstacle::get_input(&self.agent, &self.xhat, &ideal, &self.input, delta);
     self.agent.noisy_move(&self.xhat, &input, delta);
     let (mut xhat, mut p) = EKF::predict(&self.xhat, &self.p, &self.q, &input, delta);
     let mut k: na::Matrix3x2<f64> = na::Matrix3x2::zeros();

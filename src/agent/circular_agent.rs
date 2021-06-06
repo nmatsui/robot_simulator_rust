@@ -4,6 +4,7 @@ extern crate nalgebra as na;
 
 use crate::agent::{AgentDerive, Agent};
 use crate::data::{Point, Observed};
+use crate::models::robot;
 use crate::utils;
 use agent_derive::AgentDerive;
 
@@ -17,7 +18,7 @@ pub struct CircularAgent {
 }
 
 impl Agent for CircularAgent {
-  fn get_ideal(&self, t: f64) ->  na::Vector3<f64> {
+  fn get_ideal(&self, _: &na::Vector3<f64>, t: f64) ->  na::Vector3<f64> {
     let angle = INPUT_OMEGA * t;
     let x = angle.cos();
     let y = angle.sin();
