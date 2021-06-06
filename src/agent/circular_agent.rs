@@ -4,7 +4,6 @@ extern crate nalgebra as na;
 
 use crate::agent::{AgentDerive, Agent};
 use crate::data::{Point, Observed};
-use crate::models::robot;
 use crate::utils;
 use agent_derive::AgentDerive;
 

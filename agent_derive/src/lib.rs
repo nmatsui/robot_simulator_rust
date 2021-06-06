@@ -40,15 +40,6 @@ fn impl_agent_derive(ast: &syn::DeriveInput) -> TokenStream {
       fn get_observed(&self) -> &Vec<Observed> {
         &self.observed
       }
-      fn get_max_accelarations(&self, _: &na::Vector3<f64>) -> (f64, f64) {
-        (robot::MAX_LIN_ACC, robot::MAX_ANG_ACC)
-      }
-      fn get_linear_velocities(&self, _: &na::Vector3<f64>) -> (f64, f64) {
-        (robot::MAX_V, robot::MIN_V)
-      }
-      fn get_angular_velocities(&self, _: &na::Vector3<f64>) -> (f64, f64) {
-        (robot::MAX_OMEGA, robot::MIN_OMEGA)
-      }
     }
   };
   gen.into()
